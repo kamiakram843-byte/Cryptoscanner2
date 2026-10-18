@@ -3,95 +3,85 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Binance Multi-Timeframe Scanner</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Binance AI Technical Scanner</title>
 <script src="https://unpkg.com/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
 <style>
-:root{--bg:#0b1020;--panel:#141c30;--line:#27334c;--text:#e8edf8;--muted:#9aa9c1;--green:#20d6a0;--red:#ff6278;--yellow:#ffcc66;--blue:#719bff}
+:root{--bg:#0a1020;--panel:#141e32;--line:#2a3852;--text:#edf3ff;--muted:#9cacc5;--green:#23d6a0;--red:#ff6379;--yellow:#ffd166;--blue:#78a5ff}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:13px Arial,sans-serif}
-header{padding:18px;background:#10182a;border-bottom:1px solid var(--line)}
-h1{font-size:22px;margin:0 0 8px}
-p{color:var(--muted);line-height:1.5}
-main{padding:14px;max-width:1800px;margin:auto}
-.controls,.cards,.layout{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
-.panel,.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px}
-.stat{flex:1;min-width:120px;cursor:pointer}
-.stat b{font-size:23px;display:block;margin-top:8px}
-.stat small,.muted{color:var(--muted)}
-button,input,select{background:#0c1426;color:var(--text);border:1px solid #34425f;border-radius:6px;padding:10px}
-button{cursor:pointer}
-button:hover,.active{border-color:var(--blue);background:#203152}
-input{min-width:140px;flex:1}
-#status{color:var(--yellow);margin:10px 0}
-.tablewrap{overflow:auto;max-height:520px}
+header{padding:18px;background:#111a2d;border-bottom:1px solid var(--line)}
+h1{font-size:22px;margin:0 0 8px}h3{margin-top:5px}
+main{padding:13px;max-width:1800px;margin:auto}
+.panel,.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px;margin-bottom:13px}
+.controls,.cards,.layout{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:12px}
+.stat{flex:1;min-width:115px;cursor:pointer;margin:0}
+.stat b{display:block;font-size:23px;margin-top:8px}
+.muted,small{color:var(--muted)}
+button,input,select{background:#0b1427;color:var(--text);border:1px solid #354765;border-radius:6px;padding:10px}
+button{cursor:pointer}button:hover,.stat:hover{border-color:var(--blue)}
+input{flex:1;min-width:130px}
+.tablewrap{overflow:auto;max-height:570px}
 table{border-collapse:collapse;width:100%;white-space:nowrap}
-th,td{padding:10px 9px;text-align:right;border-bottom:1px solid var(--line)}
-th{position:sticky;top:0;background:#1b2640;cursor:pointer;z-index:1}
-td:first-child,th:first-child{text-align:left}
-tbody tr{cursor:pointer}
-tbody tr:hover{background:#202b42}
+th,td{padding:9px;text-align:right;border-bottom:1px solid var(--line)}
+th{position:sticky;top:0;background:#202c44;cursor:pointer;z-index:1}
+th:first-child,td:first-child{text-align:left}
+tbody tr{cursor:pointer}tbody tr:hover{background:#24334d}
 .green{color:var(--green)}.red{color:var(--red)}.yellow{color:var(--yellow)}
-.badge{padding:4px 7px;border-radius:5px;background:#243047}
+#status{color:var(--yellow);margin:12px 0}
 .layout>.panel{flex:1;min-width:290px}
-#chart{height:380px;width:100%}
-#details{line-height:1.9}
-.small{font-size:11px}
-footer{color:var(--muted);padding:20px;text-align:center}
+#chart{height:370px;width:100%}
+#details{line-height:1.9;overflow-wrap:anywhere}
+.note{font-size:12px;line-height:1.6;color:var(--muted)}
+footer{text-align:center;padding:20px;color:var(--muted)}
 </style>
 </head>
 <body>
 <header>
-<h1>◈ Binance Multi-Timeframe Coin Scanner</h1>
-<div class="muted">Spot markets · EMA · SMA · MACD · RSI · Volume · Risk levels</div>
+<h1>◈ Binance Multi-Timeframe Scanner</h1>
+<div class="muted">LONG / SHORT / WAIT · EMA · SMA · MACD · RSI · Volume · TP/SL</div>
 </header>
 
 <main>
 <div class="controls">
-<button id="scanBtn">▶ Start / Refresh Scan</button>
-<button id="stopBtn">Ⅱ Stop Scan</button>
-<label>Top volume pairs
-<select id="pairLimit">
-<option value="20">20</option>
-<option value="50" selected>50</option>
-<option value="100">100</option>
-<option value="200">200</option>
+<button id="start">▶ Start / Refresh</button>
+<button id="stop">Ⅱ Stop</button>
+<label>Pairs
+<select id="limit">
+<option>20</option><option selected>50</option>
+<option>100</option><option>200</option>
 </select></label>
 <label>Quote
 <select id="quote">
-<option value="USDT">USDT</option>
-<option value="USDC">USDC</option>
-<option value="BTC">BTC</option>
+<option>USDT</option><option>USDC</option><option>BTC</option>
 </select></label>
-<label>Auto refresh
-<select id="refresh">
-<option value="0">Off</option>
-<option value="60">1 minute</option>
-<option value="180">3 minutes</option>
-<option value="300" selected>5 minutes</option>
+<label>Auto
+<select id="auto">
+<option value="0">Off</option><option value="60">1 min</option>
+<option value="180">3 min</option><option value="300" selected>5 min</option>
 </select></label>
-<input id="search" placeholder="Search coin, e.g. BTCUSDT">
+<input id="search" placeholder="Search BTCUSDT, ZECUSDT...">
 </div>
-
-<div id="status">Ready. Press Start / Refresh Scan.</div>
+<div id="status">Press Start / Refresh to scan Binance spot markets.</div>
 
 <div class="cards">
-<div class="stat" data-filter="ALL"><span>All scanned</span><b id="nAll">0</b><small>Trading pairs</small></div>
-<div class="stat" data-filter="BULLISH"><span class="green">Bullish</span><b id="nBull">0</b><small>Positive trend</small></div>
-<div class="stat" data-filter="BEARISH"><span class="red">Bearish</span><b id="nBear">0</b><small>Negative trend</small></div>
-<div class="stat" data-filter="BUY"><span class="green">Buy setups</span><b id="nBuy">0</b><small>Long candidates</small></div>
-<div class="stat" data-filter="SELL"><span class="red">Sell setups</span><b id="nSell">0</b><small>Short candidates</small></div>
+<div class="stat" data-filter="ALL">All pairs<b id="all">0</b></div>
+<div class="stat" data-filter="BULLISH"><span class="green">Bullish</span><b id="bull">0</b></div>
+<div class="stat" data-filter="BEARISH"><span class="red">Bearish</span><b id="bear">0</b></div>
+<div class="stat" data-filter="LONG"><span class="green">LONG setups</span><b id="long">0</b></div>
+<div class="stat" data-filter="SHORT"><span class="red">SHORT setups</span><b id="short">0</b></div>
 </div>
 
-<div class="panel" style="margin-bottom:14px">
+<div class="panel">
 <div class="controls">
-<label>Filter
+<label>Show
 <select id="filter">
-<option value="ALL">All coins</option>
+<option value="ALL">All</option>
 <option value="BULLISH">Bullish</option>
 <option value="BEARISH">Bearish</option>
-<option value="BUY">Buy setups</option>
-<option value="SELL">Sell setups</option>
+<option value="LONG">LONG setups</option>
+<option value="SHORT">SHORT setups</option>
+<option value="WAIT">WAIT only</option>
 </select></label>
 <label>Chart timeframe
 <select id="tf">
@@ -100,9 +90,9 @@ footer{color:var(--muted);padding:20px;text-align:center}
 <option value="4h">4 hours</option>
 <option value="1d">1 day</option>
 <option value="1w">1 week</option>
-<option value="15h">15 hours (synthetic)</option>
+<option value="15h">15 hours*</option>
 </select></label>
-<span class="muted">Click a coin row to load its chart.</span>
+<span class="muted">Click a coin row to inspect it.</span>
 </div>
 <div class="tablewrap">
 <table>
@@ -110,369 +100,375 @@ footer{color:var(--muted);padding:20px;text-align:center}
 <th data-sort="symbol">Coin</th>
 <th data-sort="price">Price</th>
 <th data-sort="change">24h %</th>
-<th data-sort="volume">Vol USDT</th>
+<th data-sort="volume">Volume USDT</th>
 <th data-sort="score">Score</th>
 <th data-sort="trend">Trend</th>
 <th>15h</th><th>1h</th><th>4h</th><th>1d</th><th>1w</th>
-<th>RSI</th><th>MACD</th><th>Signal</th>
-<th>EP</th><th>SL</th><th>TP1</th><th>TP2</th><th>TP3</th>
-<th>Move %</th>
+<th>RSI 1h</th><th>MACD</th>
+<th>Direction</th><th>EP</th><th>SL</th>
+<th>TP1</th><th>TP2</th><th>TP3</th>
+<th>TP3 move</th><th>R:R</th>
 </tr></thead>
 <tbody id="rows"></tbody>
 </table>
 </div>
+<p class="note">*15h candles are aggregated from hourly data. Volume is 24-hour quote volume. Click a column heading to sort.</p>
 </div>
 
 <div class="layout">
 <div class="panel" style="flex:2">
-<h3 id="chartTitle">BTCUSDT · 1 hour chart</h3>
+<h3 id="chartTitle">Price chart</h3>
 <div id="chart"></div>
-<p class="small">Chart candles are fetched from Binance. Switch timeframe above.</p>
 </div>
 <div class="panel">
-<h3>Selected Coin Analysis</h3>
-<div id="details">Select a coin from the table to see its analysis.</div>
+<h3>Selected coin analysis</h3>
+<div id="details">Select a coin from the table.</div>
 </div>
 </div>
-<p class="small">Indicator signals are rule-based estimates, not confirmed predictions. A spot BUY/SELL signal is not the same as a futures LONG/SHORT order.</p>
+
+<div class="panel note">
+<b>Trading warning:</b> This scanner uses public Binance data and does not place trades.
+LONG and SHORT are technical candidates, not predictions or guarantees. SHORT requires an appropriate margin or futures account. On Spot, a SELL normally sells an asset you already own. Always verify prices, fees, liquidity, and risk before trading.
+</div>
 </main>
-<footer>Market data: Binance public API · No trading keys required</footer>
+<footer>Public market data · No API keys required · Educational analysis</footer>
 
 <script>
-(() => {
 "use strict";
+const $=id=>document.getElementById(id);
+const API="https://api.binance.com";
+const TF=["15m","1h","4h","1d","1w"];
+let coins=[],selected="",running=false,job=0,autoTimer=null;
+let sortKey="score",sortDir=-1,chart=null,series=null;
 
-const $ = id => document.getElementById(id);
-const API = "https://api.binance.com";
-let coins = [];
-let selected = "BTCUSDT";
-let currentFilter = "ALL";
-let scanning = false;
-let runId = 0;
-let autoTimer = null;
-let chart = null, candleSeries = null;
-let sortKey = "score", sortDir = -1;
-
-const intervals = [
- ["15m","15m"],["1h","1h"],["4h","4h"],["1d","1d"],["1w","1w"]
-];
-
-function fmt(n) {
- if (!Number.isFinite(n)) return "—";
- if (Math.abs(n) >= 1000) return n.toLocaleString("en-US",{maximumFractionDigits:2});
- if (Math.abs(n) >= 1) return n.toLocaleString("en-US",{maximumFractionDigits:5});
- return n.toPrecision(5);
+function fmt(x){
+ if(!Number.isFinite(x))return "—";
+ return x.toLocaleString("en-US",{maximumSignificantDigits:8});
 }
-function pct(n){return Number.isFinite(n)?(n>=0?"+":"")+n.toFixed(2)+"%":"—";}
-function cls(n){return n>0?"green":n<0?"red":"yellow";}
-function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function pct(x){
+ if(!Number.isFinite(x))return "—";
+ return (x>0?"+":"")+x.toFixed(2)+"%";
+}
+function color(x){return x>0?"green":x<0?"red":"yellow";}
+function wait(ms){return new Promise(r=>setTimeout(r,ms));}
 
-async function api(path) {
- const urls=[API, "https://api-gcp.binance.com","https://api1.binance.com"];
+async function api(path){
  let last;
- for(const base of urls){
-  try {
+ for(const base of [API,"https://api-gcp.binance.com","https://api1.binance.com"]){
+  try{
    const r=await fetch(base+path);
-   if(!r.ok) throw new Error("HTTP "+r.status);
+   if(!r.ok)throw Error("HTTP "+r.status);
    return await r.json();
-  } catch(e){last=e;}
+  }catch(e){last=e;}
  }
- throw last || new Error("API unavailable");
+ throw last||Error("Binance unavailable");
 }
 
-function sma(values, period) {
- if(values.length<period)return null;
- let sum=0;
- for(let i=values.length-period;i<values.length;i++)sum+=values[i];
- return sum/period;
+function ema(values,n){
+ if(values.length<n)return null;
+ let e=values.slice(0,n).reduce((a,b)=>a+b,0)/n;
+ const k=2/(n+1);
+ for(let i=n;i<values.length;i++)e=values[i]*k+e*(1-k);
+ return e;
 }
-function emaArray(values, period) {
- const out=Array(values.length).fill(null);
- if(values.length<period)return out;
- let e=values.slice(0,period).reduce((a,b)=>a+b,0)/period;
- out[period-1]=e;
- const k=2/(period+1);
- for(let i=period;i<values.length;i++){
-  e=values[i]*k+e*(1-k);out[i]=e;
- }
- return out;
+function sma(values,n){
+ if(values.length<n)return null;
+ return values.slice(-n).reduce((a,b)=>a+b,0)/n;
 }
-function rsi(values,period=14){
- if(values.length<period+1)return 50;
- let gain=0,loss=0;
- for(let i=1;i<=period;i++){
-  let d=values[i]-values[i-1];
-  if(d>0)gain+=d;else loss-=d;
+function rsi(values,n=14){
+ if(values.length<n+1)return 50;
+ let g=0,l=0;
+ for(let i=1;i<=n;i++){
+  const d=values[i]-values[i-1];
+  if(d>0)g+=d;else l-=d;
  }
- let ag=gain/period,al=loss/period;
- for(let i=period+1;i<values.length;i++){
-  let d=values[i]-values[i-1];
-  ag=(ag*(period-1)+Math.max(d,0))/period;
-  al=(al*(period-1)+Math.max(-d,0))/period;
+ g/=n;l/=n;
+ for(let i=n+1;i<values.length;i++){
+  const d=values[i]-values[i-1];
+  g=(g*(n-1)+Math.max(d,0))/n;
+  l=(l*(n-1)+Math.max(-d,0))/n;
  }
- if(al===0)return 100;
- return 100-100/(1+ag/al);
+ return l===0?100:100-100/(1+g/l);
 }
-function atr(candles,period=14){
- if(candles.length<period+1)return candles.at(-1)?.c*0.02||0;
+function atr(cs,n=14){
+ if(cs.length<2)return 0;
  const tr=[];
- for(let i=1;i<candles.length;i++){
-  const c=candles[i],p=candles[i-1];
+ for(let i=1;i<cs.length;i++){
+  const c=cs[i],p=cs[i-1];
   tr.push(Math.max(c.h-c.l,Math.abs(c.h-p.c),Math.abs(c.l-p.c)));
  }
- return tr.slice(-period).reduce((a,b)=>a+b,0)/Math.min(period,tr.length);
+ return tr.slice(-n).reduce((a,b)=>a+b,0)/Math.min(n,tr.length);
 }
-function indicators(candles){
- const cs=candles.map(x=>x.c);
- const vols=candles.map(x=>x.v);
- const fast=emaArray(cs,12),slow=emaArray(cs,26);
- const macd=fast.at(-1)!=null&&slow.at(-1)!=null?fast.at(-1)-slow.at(-1):0;
- const hist=[];
- for(let i=0;i<cs.length;i++)if(fast[i]!=null&&slow[i]!=null)hist.push(fast[i]-slow[i]);
- const sig=emaArray(hist,9).at(-1);
- const rv=rsi(cs), e20=emaArray(cs,20).at(-1), e50=emaArray(cs,50).at(-1);
- const s20=sma(cs,Math.min(20,cs.length));
- const volAvg=sma(vols,Math.min(20,vols.length))||0;
- const last=candles.at(-1);
- let score=0;
- if(last.c>e20)score++;
- else score--;
- if(last.c>e50)score++;
- else score--;
- if(s20!=null){if(last.c>s20)score++;else score--;}
- if(macd>(sig||0))score++;else score--;
- if(rv>55)score++;else if(rv<45)score--;
- if(volAvg>0&&last.v>volAvg*1.2)score+=last.c>last.o?1:last.c<last.o?-1:0;
- return {rsi:rv,macd,signal:sig||0,ema20:e20,ema50:e50,sma20:s20,volAvg,atr:atr(candles),score};
-}
-
-function aggregate15h(hourly){
- const buckets=new Map();
- for(const c of hourly){
-  const t=Math.floor(c.t/(15*3600))*15*3600;
-  if(!buckets.has(t))buckets.set(t,{t,o:c.o,h:c.h,l:c.l,c:c.c,v:c.v});
-  else {
-   const b=buckets.get(t);b.h=Math.max(b.h,c.h);b.l=Math.min(b.l,c.l);b.c=c.c;b.v+=c.v;
+function ind(cs){
+ const closes=cs.map(x=>x.c),vols=cs.map(x=>x.v),last=cs.at(-1);
+ const e20=ema(closes,20),e50=ema(closes,50);
+ const s20=sma(closes,20);
+ const e12=ema(closes,12),e26=ema(closes,26);
+ const macd=e12!==null&&e26!==null?e12-e26:0;
+ // MACD signal from the sequence of EMA12 - EMA26.
+ const signalSeries=[];
+ let a12=closes.slice(0,12).reduce((x,y)=>x+y,0)/12;
+ let a26=closes.slice(0,26).reduce((x,y)=>x+y,0)/26;
+ for(let i=25;i<closes.length;i++){
+  if(i===25){
+   a12=closes.slice(i-11,i+1).reduce((x,y)=>x+y,0)/12;
+   a26=closes.slice(0,26).reduce((x,y)=>x+y,0)/26;
+  }else{
+   a12=closes[i]*(2/13)+a12*(11/13);
+   a26=closes[i]*(2/27)+a26*(25/27);
   }
+  signalSeries.push(a12-a26);
  }
- return [...buckets.values()];
+ const sig=ema(signalSeries,9)??macd;
+ const rv=rsi(closes);
+ const vavg=sma(vols,20)||0;
+ let score=0;
+ if(e20!==null)score+=last.c>e20?1:-1;
+ if(e50!==null)score+=last.c>e50?1:-1;
+ if(s20!==null)score+=last.c>s20?1:-1;
+ score+=macd>sig?1:-1;
+ score+=rv>55?1:rv<45?-1:0;
+ if(vavg>0&&last.v>1.2*vavg)score+=last.c>last.o?1:last.c<last.o?-1:0;
+ return {score,rsi:rv,macd,sig,e20,e50,s20,atr:atr(cs),vavg};
 }
-
-async function candles(symbol,tf,limit=150){
- let interval=tf;
- if(tf==="15h"){
-  const raw=await api(`/api/v3/klines?symbol=${symbol}&interval=1h&limit=1000`);
-  return aggregate15h(raw.map(k=>({t:Math.floor(k[0]/1000),o:+k[1],h:+k[2],l:+k[3],c:+k[4],v:+k[5]})));
- }
- const raw=await api(`/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`);
+function parseKlines(raw){
  return raw.map(k=>({t:Math.floor(k[0]/1000),o:+k[1],h:+k[2],l:+k[3],c:+k[4],v:+k[5]}));
 }
-
-async function analyze(symbol,ticker,id){
- const timeData={};
- for(const [tf] of intervals){
-  if(id!==runId)throw new Error("Cancelled");
-  const c=await candles(symbol,tf,tf==="1w"?150:150);
-  timeData[tf]={candles:c,ind:indicators(c)};
-  await sleep(35);
+async function getCandles(symbol,tf,limit=150){
+ if(tf!=="15h"){
+  return parseKlines(await api(`/api/v3/klines?symbol=${symbol}&interval=${tf}&limit=${limit}`));
  }
- const c15=await candles(symbol,"15h");
- timeData["15h"]={candles:c15,ind:indicators(c15)};
- const main=timeData["1h"].ind;
- const price=+ticker.lastPrice;
- const change=+ticker.priceChangePercent;
- const volume=+ticker.quoteVolume;
- const scores=Object.values(timeData).map(x=>x.ind.score);
- const score=scores.reduce((a,b)=>a+b,0);
+ // Build synthetic 15h candles from up to 1000 hourly candles.
+ const raw=parseKlines(await api(`/api/v3/klines?symbol=${symbol}&interval=1h&limit=1000`));
+ const map=new Map();
+ for(const c of raw){
+  const t=Math.floor(c.t/54000)*54000;
+  if(!map.has(t))map.set(t,{t,o:c.o,h:c.h,l:c.l,c:c.c,v:c.v});
+  else{
+   const b=map.get(t);b.h=Math.max(b.h,c.h);b.l=Math.min(b.l,c.l);b.c=c.c;b.v+=c.v;
+  }
+ }
+ return [...map.values()];
+}
+async function analyze(ticker,id){
+ const symbol=ticker.symbol,frames={};
+ for(const tf of TF){
+  if(id!==job)throw Error("Stopped");
+  frames[tf]=await getCandles(symbol,tf,150);
+  await wait(30);
+ }
+ if(id!==job)throw Error("Stopped");
+ frames["15h"]=await getCandles(symbol,"15h");
+ const ix={};
+ for(const tf of [...TF,"15h"])ix[tf]=ind(frames[tf]);
+
+ const scoreList=Object.values(ix).map(x=>x.score);
+ const score=scoreList.reduce((a,b)=>a+b,0);
  const trend=score>=3?"BULLISH":score<=-3?"BEARISH":"NEUTRAL";
- // A candidate needs multiple timeframe agreement and volume.
- const bullTF=["15h","1h","4h","1d"].filter(t=>timeData[t].ind.score>0).length;
- const bearTF=["15h","1h","4h","1d"].filter(t=>timeData[t].ind.score<0).length;
- let signal="WAIT";
- if(bullTF>=3&&main.rsi>=45&&main.rsi<=70&&main.macd>main.signal)signal="BUY";
- if(bearTF>=3&&main.rsi>=30&&main.rsi<=55&&main.macd<main.signal)signal="SELL";
- // Price levels use ATR-based illustrative risk targets.
- const a=main.atr||price*.02;
- let ep=price,sl,tp1,tp2,tp3;
- if(signal==="BUY"){
+ const bullTF=["15m","1h","4h","1d"].filter(t=>ix[t].score>0).length;
+ const bearTF=["15m","1h","4h","1d"].filter(t=>ix[t].score<0).length;
+ const h=ix["1h"];
+
+ // Entry is the latest price. Only issue a setup when trend,
+ // timeframe agreement, MACD, and RSI agree.
+ let direction="WAIT";
+ if(bullTF>=3&&h.macd>h.sig&&h.rsi>=50&&h.rsi<=70)direction="LONG";
+ else if(bearTF>=3&&h.macd<h.sig&&h.rsi>=30&&h.rsi<=50)direction="SHORT";
+
+ const ep=+ticker.lastPrice;
+ const a=h.atr||ep*.02;
+ let sl=null,tp1=null,tp2=null,tp3=null,move=null,rr=null;
+ if(direction==="LONG"){
   sl=ep-1.5*a;tp1=ep+1.5*a;tp2=ep+2.5*a;tp3=ep+3.5*a;
- }else if(signal==="SELL"){
+  move=(tp3-ep)/ep*100;
+  rr=(tp3-ep)/(ep-sl);
+ }else if(direction==="SHORT"){
   sl=ep+1.5*a;tp1=ep-1.5*a;tp2=ep-2.5*a;tp3=ep-3.5*a;
- }else{
-  sl=ep-1.5*a;tp1=ep+1.5*a;tp2=ep+2.5*a;tp3=ep+3.5*a;
+  move=(tp3-ep)/ep*100; // negative means estimated downside
+  rr=(ep-tp3)/(sl-ep);
  }
- return {symbol,price,change,volume,score,trend,signal,timeData,ep,sl,tp1,tp2,tp3,
-  move:signal==="SELL"?(tp3-ep)/ep*100:(tp3-ep)/ep*100};
+ return {
+  symbol,price:ep,change:+ticker.priceChangePercent,
+  volume:+ticker.quoteVolume,frames,ix,score,trend,direction,
+  ep,sl,tp1,tp2,tp3,move,rr
+ };
 }
 
-function updateCards(){
- $("nAll").textContent=coins.length;
- $("nBull").textContent=coins.filter(c=>c.trend==="BULLISH").length;
- $("nBear").textContent=coins.filter(c=>c.trend==="BEARISH").length;
- $("nBuy").textContent=coins.filter(c=>c.signal==="BUY").length;
- $("nSell").textContent=coins.filter(c=>c.signal==="SELL").length;
-}
-
-function filtered(){
- const q=$("search").value.toUpperCase().trim();
- return coins.filter(c=>{
-  const f=$("filter").value;
-  return (!q||c.symbol.includes(q))&&
-   (f==="ALL"||c.trend===f||c.signal===f);
- }).sort((a,b)=>{
-  let x=a[sortKey],y=b[sortKey];
+function render(){
+ const q=$("search").value.trim().toUpperCase(),f=$("filter").value;
+ const data=coins.filter(c=>
+  (!q||c.symbol.includes(q))&&
+  (f==="ALL"||c.trend===f||c.direction===f)
+ );
+ data.sort((a,b)=>{
+  const x=a[sortKey],y=b[sortKey];
   if(typeof x==="string")return sortDir*x.localeCompare(y);
   return sortDir*((x||0)-(y||0));
  });
-}
-function render(){
- updateCards();
- const data=filtered();
+ $("all").textContent=coins.length;
+ $("bull").textContent=coins.filter(c=>c.trend==="BULLISH").length;
+ $("bear").textContent=coins.filter(c=>c.trend==="BEARISH").length;
+ $("long").textContent=coins.filter(c=>c.direction==="LONG").length;
+ $("short").textContent=coins.filter(c=>c.direction==="SHORT").length;
+
  $("rows").innerHTML=data.map(c=>{
-  const t=c.timeData;
-  const cell=tf=>`<td class="${t[tf].ind.score>0?"green":t[tf].ind.score<0?"red":""}">${t[tf].ind.score>0?"Bull":t[tf].ind.score<0?"Bear":"Flat"}</td>`;
+  const level=x=>x==null?"—":fmt(x);
+  const tfcell=tf=>`<td class="${c.ix[tf].score>0?"green":c.ix[tf].score<0?"red":"yellow"}">${c.ix[tf].score>0?"Bull":c.ix[tf].score<0?"Bear":"Flat"}</td>`;
+  const dcls=c.direction==="LONG"?"green":c.direction==="SHORT"?"red":"yellow";
+  const move=c.move===null?"—":`${pct(c.move)} ${c.move>0?"up":c.move<0?"down":""}`;
   return `<tr data-symbol="${c.symbol}">
-  <td><b>${c.symbol}</b></td><td>${fmt(c.price)}</td>
-  <td class="${cls(c.change)}">${pct(c.change)}</td>
-  <td>${fmt(c.volume)}</td><td>${c.score}</td>
-  <td class="${c.trend==="BULLISH"?"green":c.trend==="BEARISH"?"red":"yellow"}">${c.trend}</td>
-  ${cell("15h")}${cell("1h")}${cell("4h")}${cell("1d")}${cell("1w")}
-  <td class="${c.timeData["1h"].ind.rsi>70?"red":c.timeData["1h"].ind.rsi<30?"green":""}">${c.timeData["1h"].ind.rsi.toFixed(1)}</td>
-  <td class="${cls(c.timeData["1h"].ind.macd-c.timeData["1h"].ind.signal)}">${fmt(c.timeData["1h"].ind.macd)}</td>
-  <td class="${c.signal==="BUY"?"green":c.signal==="SELL"?"red":"yellow"}">${c.signal}</td>
-  <td>${fmt(c.ep)}</td><td>${fmt(c.sl)}</td><td>${fmt(c.tp1)}</td>
-  <td>${fmt(c.tp2)}</td><td>${fmt(c.tp3)}</td>
-  <td class="${cls(c.move)}">${pct(c.move)}</td></tr>`;
+   <td><b>${c.symbol}</b></td>
+   <td>${fmt(c.price)}</td><td class="${color(c.change)}">${pct(c.change)}</td>
+   <td>${fmt(c.volume)}</td><td>${c.score}</td>
+   <td class="${c.trend==="BULLISH"?"green":c.trend==="BEARISH"?"red":"yellow"}">${c.trend}</td>
+   ${tfcell("15h")}${tfcell("1h")}${tfcell("4h")}${tfcell("1d")}${tfcell("1w")}
+   <td>${c.ix["1h"].rsi.toFixed(1)}</td>
+   <td class="${color(c.ix["1h"].macd-c.ix["1h"].sig)}">${fmt(c.ix["1h"].macd)}</td>
+   <td class="${dcls}"><b>${c.direction}</b></td>
+   <td>${level(c.ep)}</td><td>${level(c.sl)}</td>
+   <td>${level(c.tp1)}</td><td>${level(c.tp2)}</td><td>${level(c.tp3)}</td>
+   <td class="${color(c.move||0)}">${move}</td><td>${c.rr===null?"—":c.rr.toFixed(2)}</td>
+  </tr>`;
  }).join("");
  $("rows").querySelectorAll("tr").forEach(tr=>tr.onclick=()=>{
   selected=tr.dataset.symbol;showSelected();
  });
- $("status").textContent=`Loaded ${coins.length} pairs · Showing ${data.length} · Updated ${new Date().toLocaleTimeString()}`;
+ $("status").textContent=`Analyzed ${coins.length} pairs · ${data.length} shown · ${new Date().toLocaleTimeString()}`;
 }
+
 function showSelected(){
  const c=coins.find(x=>x.symbol===selected);
  if(!c)return;
- const i=c.timeData["1h"].ind;
+ const i=c.ix["1h"];
+ const directionText=c.direction==="LONG"?"Potential upside toward TP3":
+ c.direction==="SHORT"?"Potential downside toward TP3":"No trade: wait for confirmation";
+ const level=x=>x==null?"—":fmt(x);
  $("details").innerHTML=`
- <b>${c.symbol}</b><br>Last price: ${fmt(c.price)}<br>
- Trend: <span class="${c.trend==="BULLISH"?"green":c.trend==="BEARISH"?"red":"yellow"}">${c.trend}</span><br>
- Signal: <b>${c.signal}</b><br>
+ <b>${c.symbol}</b><br>
+ Last price: <b>${fmt(c.price)}</b><br>
+ 24h change: <span class="${color(c.change)}">${pct(c.change)}</span><br>
+ Trend: <b class="${c.trend==="BULLISH"?"green":c.trend==="BEARISH"?"red":"yellow"}">${c.trend}</b><br>
+ Suggested setup: <b class="${c.direction==="LONG"?"green":c.direction==="SHORT"?"red":"yellow"}">${c.direction}</b><br>
  Combined score: ${c.score}<br>
  RSI (1h): ${i.rsi.toFixed(2)}<br>
- MACD (1h): ${fmt(i.macd)}<br>
- MACD signal: ${fmt(i.signal)}<br>
- EMA20: ${fmt(i.ema20)}<br>EMA50: ${fmt(i.ema50)}<br>
- SMA20: ${fmt(i.sma20)}<br>ATR14: ${fmt(i.atr)}<br>
- Volume: ${fmt(c.volume)} USDT<br><hr>
- Entry (EP): ${fmt(c.ep)}<br>
- Stop loss (SL): ${fmt(c.sl)}<br>
- TP1: ${fmt(c.tp1)}<br>TP2: ${fmt(c.tp2)}<br>TP3: ${fmt(c.tp3)}<br>
- Estimated TP3 move: ${pct(c.move)}<br><hr>
- <span class="muted">Levels are estimates. WAIT means there is no qualifying setup.
- A spot SELL signal does not open a short position.</span>`;
+ MACD: ${fmt(i.macd)} · Signal: ${fmt(i.sig)}<br>
+ EMA20: ${fmt(i.e20)}<br>EMA50: ${fmt(i.e50)}<br>
+ SMA20: ${fmt(i.s20)}<br>ATR14: ${fmt(i.atr)}<br>
+ Volume (24h quote): ${fmt(c.volume)}<hr>
+ Entry (EP): ${level(c.ep)}<br>
+ Stop loss (SL): ${level(c.sl)}<br>
+ TP1: ${level(c.tp1)}<br>TP2: ${level(c.tp2)}<br>TP3: ${level(c.tp3)}<br>
+ Estimated TP1 move: ${c.tp1==null?"—":pct((c.tp1-c.ep)/c.ep*100)}<br>
+ Estimated TP2 move: ${c.tp2==null?"—":pct((c.tp2-c.ep)/c.ep*100)}<br>
+ Estimated TP3 move: ${c.move==null?"—":pct(c.move)}<br>
+ Risk/reward to TP3: ${c.rr==null?"—":c.rr.toFixed(2)+":1"}<hr>
+ <b>${directionText}</b><br>
+ <span class="note">Target distances are ATR-based scenarios, not forecasts. WAIT levels are intentionally blank.</span>`;
  loadChart();
 }
 async function loadChart(){
+ const symbol=selected;
+ if(!symbol)return;
  const tf=$("tf").value;
- $("chartTitle").textContent=selected+" · "+tf+" chart";
+ $("chartTitle").textContent=`${symbol} · ${tf} chart`;
  try{
-  const c=await candles(selected,tf,200);
-  if(!window.LightweightCharts)throw new Error("Chart library unavailable. Check internet.");
+  const data=await getCandles(symbol,tf,200);
+  if(symbol!==selected||tf!==$("tf").value)return;
+  if(!window.LightweightCharts)throw Error("Chart library failed to load.");
   if(!chart){
    chart=LightweightCharts.createChart($("chart"),{
-    layout:{background:{color:"#141c30"},textColor:"#dbe4f3"},
-    grid:{vertLines:{color:"#27334c"},horzLines:{color:"#27334c"}},
-    rightPriceScale:{borderColor:"#34425f"},
-    timeScale:{borderColor:"#34425f",timeVisible:true},
-    width:$("chart").clientWidth,height:380
+    width:$("chart").clientWidth,height:370,
+    layout:{background:{color:"#141e32"},textColor:"#dce6f8"},
+    grid:{vertLines:{color:"#2a3852"},horzLines:{color:"#2a3852"}},
+    timeScale:{timeVisible:true,borderColor:"#354765"},
+    rightPriceScale:{borderColor:"#354765"}
    });
-   candleSeries=chart.addCandlestickSeries({
-    upColor:"#20d6a0",downColor:"#ff6278",
-    borderUpColor:"#20d6a0",borderDownColor:"#ff6278",
-    wickUpColor:"#20d6a0",wickDownColor:"#ff6278"
+   series=chart.addCandlestickSeries({
+    upColor:"#23d6a0",downColor:"#ff6379",
+    borderUpColor:"#23d6a0",borderDownColor:"#ff6379",
+    wickUpColor:"#23d6a0",wickDownColor:"#ff6379"
    });
    new ResizeObserver(()=>chart&&chart.applyOptions({width:$("chart").clientWidth})).observe($("chart"));
   }
-  candleSeries.setData(c.map(x=>({time:x.t,open:x.o,high:x.h,low:x.l,close:x.c})));
+  series.setData(data.map(c=>({time:c.t,open:c.o,high:c.h,low:c.l,close:c.c})));
   chart.timeScale().fitContent();
- }catch(e){$("chartTitle").textContent=selected+" · "+e.message;}
+ }catch(e){$("chartTitle").textContent=`${symbol} · ${e.message}`;}
 }
 
 async function startScan(){
- if(scanning)return;
- scanning=true;
- const id=++runId;
- $("status").textContent="Loading Binance spot markets...";
+ if(running)return;
+ running=true;
+ const id=++job;
+ $("status").textContent="Fetching Binance markets...";
  try{
   const [info,tickers]=await Promise.all([
    api("/api/v3/exchangeInfo"),api("/api/v3/ticker/24hr")
   ]);
+  if(id!==job)return;
   const quote=$("quote").value;
   const allowed=new Set(info.symbols.filter(s=>
    s.status==="TRADING"&&s.isSpotTradingAllowed&&s.quoteAsset===quote
   ).map(s=>s.symbol));
   const list=tickers.filter(t=>allowed.has(t.symbol))
    .sort((a,b)=>+b.quoteVolume- +a.quoteVolume)
-   .slice(0,+$("pairLimit").value);
+   .slice(0,+$("limit").value);
   coins=[];render();
-  let done=0;
-  // Small worker pool reduces API bursts and rate-limit risk.
-  let index=0;
+  let next=0,done=0;
   async function worker(){
-   while(index<list.length&&id===runId){
-    const item=list[index++];
+   while(next<list.length&&id===job){
+    const t=list[next++];
     try{
-     const result=await analyze(item.symbol,item,id);
-     if(id!==runId)return;
-     coins.push(result);done++;
-     if(done%3===0||done===list.length)render();
+     const c=await analyze(t,id);
+     if(id!==job)return;
+     coins.push(c);done++;
+     render();
     }catch(e){
-     if(id===runId)$("status").textContent=`Scanning ${done}/${list.length}; some pairs failed: ${e.message}`;
+     if(id===job)$("status").textContent=`Analyzed ${done}/${list.length}; a pair failed to load. ${e.message}`;
     }
-    await sleep(120);
+    await wait(180);
    }
   }
-  await Promise.all(Array.from({length:3},()=>worker()));
-  if(id===runId){
-   coins.sort((a,b)=>b.score-a.score);render();
+  // Conservative concurrency to reduce rate-limit pressure.
+  await Promise.all([worker(),worker()]);
+  if(id===job){
+   coins.sort((a,b)=>b.score-a.score);
+   render();
    if(!coins.some(c=>c.symbol===selected)&&coins.length)selected=coins[0].symbol;
    showSelected();
-   $("status").textContent=`Scan complete: ${coins.length} pairs analyzed.`;
+   $("status").textContent=`Scan finished. ${coins.length}/${list.length} pairs analyzed.`;
   }
  }catch(e){
-  $("status").textContent="Scan failed: "+e.message+" — check internet or Binance API availability.";
+  if(id===job)$("status").textContent="Scan failed: "+e.message+". Check internet/API access.";
  }finally{
-  if(id===runId)scanning=false;
+  if(id===job)running=false;
  }
 }
 function stopScan(){
- runId++;scanning=false;
- $("status").textContent="Scan stopped. Already completed results remain visible.";
+ job++;running=false;
+ $("status").textContent="Stopped. Completed results remain visible.";
 }
-$("scanBtn").onclick=()=>startScan();
-$("stopBtn").onclick=stopScan;
+
+$("start").onclick=startScan;
+$("stop").onclick=stopScan;
 $("search").addEventListener("input",render);
 $("filter").onchange=render;
 $("tf").onchange=loadChart;
-$("quote").onchange=()=>{coins=[];render();};
-$("pairLimit").onchange=()=>{coins=[];render();};
 document.querySelectorAll("[data-filter]").forEach(el=>el.onclick=()=>{
  $("filter").value=el.dataset.filter;render();
 });
 document.querySelectorAll("th[data-sort]").forEach(th=>th.onclick=()=>{
- const key=th.dataset.sort;
- sortDir=sortKey===key?-sortDir:1;sortKey=key;render();
+ const k=th.dataset.sort;
+ sortDir=sortKey===k?-sortDir:1;sortKey=k;render();
 });
-$("refresh").onchange=()=>{
+$("quote").onchange=()=>{coins=[];render();};
+$("limit").onchange=()=>{coins=[];render();};
+$("auto").onchange=()=>{
  if(autoTimer)clearInterval(autoTimer);
  autoTimer=null;
- const s=+$("refresh").value;
- if(s)autoTimer=setInterval(()=>{if(!scanning)startScan();},s*1000);
+ const s=+$("auto").value;
+ if(s)autoTimer=setInterval(()=>{if(!running)startScan();},s*1000);
 };
-window.addEventListener("load",()=>{
- $("refresh").dispatchEvent(new Event("change"));
-});
-})();
+$("auto").dispatchEvent(new Event("change"));
 </script>
 </body>
 </html>
